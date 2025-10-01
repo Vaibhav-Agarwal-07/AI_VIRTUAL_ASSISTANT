@@ -1,10 +1,8 @@
-<<<<<<< HEAD
+# Backend
 backend/.env
 backend/node_modules/
 backend/dist/
+
+# Frontend
+frontend/.env
 frontend/node_modules/
-=======
-.env
-node_modules/
-dist/
->>>>>>> e1a61590dc37e697ec7c4f14edaec9bf70aaa438
