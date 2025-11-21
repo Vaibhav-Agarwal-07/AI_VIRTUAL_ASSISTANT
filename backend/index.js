@@ -10,21 +10,32 @@ import userRouter from "./routes/user.routes.js";
 const app = express();
 const port = process.env.PORT || 5000;
 
-// ✅ FIXED CORS CONFIG
+// Allowed frontend URLs
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://virtualassistant-ai.netlify.app"
+];
+
+// Main CORS middleware
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://virtualassistant-ai.netlify.app"   // <-- your real Netlify URL
-    ],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
 
-// ✅ Allow preflight requests
-app.options("*", cors());
+// Additional headers (Express 5 compatible)
+app.use((req, res, next) => {
+  if (allowedOrigins.includes(req.headers.origin)) {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+  }
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
 
-// Middleware
+// Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
@@ -32,7 +43,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 
-// Connect DB + Start Server
+// Start server
 app.listen(port, () => {
   connectDb();
   console.log("Server started on port", port);
