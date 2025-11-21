@@ -1,32 +1,39 @@
+import express from "express";
+import dotenv from "dotenv";
+dotenv.config();
+import connectDb from "./config/db.js";
+import authRouter from "./routes/auth.routes.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import userRouter from "./routes/user.routes.js";
 
-import express from "express"
-import dotenv from "dotenv"
-dotenv.config()
-import connectDb from "./config/db.js"
-import authRouter from "./routes/auth.routes.js"
-import cors from "cors"
-import cookieParser from "cookie-parser"
-import userRouter from "./routes/user.routes.js"
+const app = express();
+const port = process.env.PORT || 5000;
 
-const app = express()
-
-app.use(cors({
+// ✅ FIXED CORS CONFIG
+app.use(
+  cors({
     origin: [
-        "http://localhost:5173",
-        "https://your-netlify-name.netlify.app"
+      "http://localhost:5173",
+      "https://virtualassistant-ai.netlify.app"   // <-- your real Netlify URL
     ],
-    credentials: true
-}))
+    credentials: true,
+  })
+);
 
-const port = process.env.PORT || 5000
+// ✅ Allow preflight requests
+app.options("*", cors());
 
-app.use(express.json())
-app.use(cookieParser())  
+// Middleware
+app.use(express.json());
+app.use(cookieParser());
 
-app.use("/api/auth", authRouter)
-app.use("/api/user", userRouter)
+// Routes
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
+// Connect DB + Start Server
 app.listen(port, () => {
-    connectDb()
-    console.log("server started")
-})  
+  connectDb();
+  console.log("Server started on port", port);
+});
